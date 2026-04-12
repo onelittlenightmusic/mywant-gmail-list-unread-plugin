@@ -95,7 +95,6 @@ wantType:
 
   onInitialize:
     current:
-      status: "pending"
       skill_path: "~/.mywant/custom-types/mywant-gmail-list-unread-plugin/main.py"
 
   requires:
