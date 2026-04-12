@@ -4,8 +4,9 @@ wantType:
     title: Gmail Unread Important
     description: |
       Fetches unread important emails from Gmail via the list-unread-gmail skill.
-      Calls python3 ~/.mywant/skills/list-unread-gmail/main.py.
-      The skill outputs JSON; state fields with onFetchData are populated automatically.
+      Calls python3 ~/.mywant/custom-types/mywant-gmail-list-unread-plugin/main.py.
+      The skill outputs JSON; state fields with fetchFrom+onFetchData are populated automatically
+      by EndProgressCycle after the MRS agent writes mrs_raw_output.
       Completes after a single execution.
     version: '1.0'
     category: gmail
@@ -19,6 +20,27 @@ wantType:
     value: "pending"
 
   state:
+    - name: skill_timeout_seconds
+      description: Max seconds to wait for the skill script to complete (default 120)
+      type: int
+      label: goal
+      persistent: false
+      initialValue: 120
+
+    - name: skill_path
+      description: Path to the MRS skill script (set by onInitialize)
+      type: string
+      label: current
+      persistent: false
+      initialValue: ""
+
+    - name: mrs_raw_output
+      description: Raw JSON output from the MRS skill (source for fetchFrom fields)
+      type: object
+      label: current
+      persistent: false
+      initialValue: null
+
     - name: status
       description: Execution status (pending, done, failed)
       type: string
@@ -39,6 +61,7 @@ wantType:
       label: current
       persistent: true
       initialValue: 0
+      fetchFrom: mrs_raw_output
       onFetchData: "count"
 
     - name: summary
@@ -54,6 +77,7 @@ wantType:
       label: current
       persistent: true
       initialValue: ""
+      fetchFrom: mrs_raw_output
       onFetchData: "emails[0].sender"
 
     - name: first_subject
@@ -62,6 +86,7 @@ wantType:
       label: current
       persistent: true
       initialValue: ""
+      fetchFrom: mrs_raw_output
       onFetchData: "emails[0].subject"
 
     - name: first_date
@@ -70,31 +95,16 @@ wantType:
       label: current
       persistent: true
       initialValue: ""
+      fetchFrom: mrs_raw_output
       onFetchData: "emails[0].date"
 
   onInitialize:
     current:
       status: "pending"
+      skill_path: "~/.mywant/custom-types/mywant-gmail-list-unread-plugin/main.py"
 
-  inlineAgents:
-    - name: run_list_unread
-      type: do
-      runtime: shell
-      script: |
-        #!/bin/sh
-        OUTPUT=$(python3 ~/.mywant/skills/list-unread-gmail/main.py 2>/dev/null)
-        EXIT_CODE=$?
-
-        if [ $EXIT_CODE -eq 0 ]; then
-          COUNT=$(printf '%s' "$OUTPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('count',0))")
-          SUMMARY="${COUNT} unread important email(s)"
-          ESCAPED_SUMMARY=$(printf '%s' "$SUMMARY" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")
-          printf '{"json_data": %s, "current_updates": {"status": "done", "summary": %s}}' "$OUTPUT" "$ESCAPED_SUMMARY"
-        else
-          ERROR_MSG=$(printf '%s' "$OUTPUT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('error','unknown error'))" 2>/dev/null || echo "gmail script failed")
-          ESCAPED=$(printf '%s' "$ERROR_MSG" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")
-          printf '{"current_updates": {"error": %s, "status": "failed"}}' "$ESCAPED"
-        fi
+  requires:
+    - monitor_mrs_agent
 
   examples:
     - name: Check Unread Gmail
