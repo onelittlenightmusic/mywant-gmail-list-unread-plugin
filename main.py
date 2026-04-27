@@ -27,8 +27,12 @@ CACHE_FILE = "/tmp/gmail_unread_list.json"
 GMAIL_IMPORTANT_URL = "https://mail.google.com/mail/u/0/#imp"
 
 
+def report_progress(percentage, message=""):
+    print(json.dumps({"_progress": percentage, "_message": message}, ensure_ascii=False), flush=True)
+
+
 def error_out(message: str) -> None:
-    print(json.dumps({"error": message, "count": 0, "emails": []}, ensure_ascii=False))
+    print(json.dumps({"error": message, "count": 0, "emails": []}, ensure_ascii=False), flush=True)
     sys.exit(1)
 
 
@@ -72,6 +76,7 @@ def fetch_unread_important(page) -> list[dict]:
 
 
 def main() -> None:
+    report_progress(5, "Connecting to browser")
     with sync_playwright() as p:
         try:
             browser = p.chromium.connect_over_cdp(CDP_URL)
@@ -81,14 +86,17 @@ def main() -> None:
         context = browser.contexts[0] if browser.contexts else browser.new_context()
         page = context.pages[0] if context.pages else context.new_page()
 
+        report_progress(20, "Navigating to Gmail")
         emails = fetch_unread_important(page)
 
+    report_progress(90, f"Found {len(emails)} unread emails")
     result = {"count": len(emails), "emails": emails}
 
     # mark-read スキルが参照するキャッシュを保存
     Path(CACHE_FILE).write_text(json.dumps(emails, ensure_ascii=False, indent=2))
 
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    report_progress(100, "Done")
+    print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
 
 
 if __name__ == "__main__":
