@@ -12,7 +12,7 @@ wantType:
     category: gmail
     pattern: independent
 
-  finalResultField: summary
+  finalResultField: mrs_raw_output.emails
 
   state:
     - name: skill_timeout_seconds
