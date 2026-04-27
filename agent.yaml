@@ -1,0 +1,29 @@
+agent:
+  metadata:
+    name: gmail_list_unread_agent
+    capability: gmail_list_unread
+    type: monitor
+  script:
+    path: ./main.py
+    timeout_seconds: 120
+  state_updates:
+    - name: count
+      type: int
+      label: current
+      persistent: true
+      onFetchData: "count"
+    - name: first_sender
+      type: string
+      label: current
+      persistent: true
+      onFetchData: "emails[0].sender"
+    - name: first_subject
+      type: string
+      label: current
+      persistent: true
+      onFetchData: "emails[0].subject"
+    - name: first_date
+      type: string
+      label: current
+      persistent: true
+      onFetchData: "emails[0].date"
