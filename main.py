@@ -96,7 +96,7 @@ def main() -> None:
     Path(CACHE_FILE).write_text(json.dumps(emails, ensure_ascii=False, indent=2))
 
     report_progress(100, "Done")
-    print(json.dumps(result, ensure_ascii=False, indent=2), flush=True)
+    print(json.dumps(result, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":
