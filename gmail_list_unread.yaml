@@ -11,6 +11,10 @@ wantType:
     version: '1.0'
     category: gmail
     pattern: independent
+    labels:
+      category-icon: Mail
+      category-bg-light: "linear-gradient(160deg, #fecaca 0%, #fff1f2 100%)"
+      category-bg-dark: "linear-gradient(160deg, #991b1b 0%, #450a0a 100%)"
 
   finalResultField: mrs_raw_output.emails
 

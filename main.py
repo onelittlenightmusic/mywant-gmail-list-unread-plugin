@@ -84,10 +84,13 @@ def main() -> None:
             error_out(f"ブラウザに接続できません ({CDP_URL}): {e}")
 
         context = browser.contexts[0] if browser.contexts else browser.new_context()
-        page = context.pages[0] if context.pages else context.new_page()
+        page = context.new_page()
 
         report_progress(20, "Navigating to Gmail")
-        emails = fetch_unread_important(page)
+        try:
+            emails = fetch_unread_important(page)
+        finally:
+            page.close()
 
     report_progress(90, f"Found {len(emails)} unread emails")
     result = {"count": len(emails), "emails": emails}
