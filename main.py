@@ -14,36 +14,13 @@ list-unread-gmail: GmailのImportantラベルにある未読メールをJSONで�
 import json
 import os
 import sys
-import urllib.request
 from pathlib import Path
+
+sys.path.insert(0, os.path.expanduser("~/.mywant/custom-types/shared"))
+from mywant_browser_run import browser_run  # noqa: E402
 
 CACHE_FILE = "/tmp/gmail_unread_list.json"
 GMAIL_IMPORTANT_URL = "https://mail.google.com/mail/u/0/#imp"
-MYWANT_API = os.environ.get("MYWANT_URL", "http://localhost:8080")
-
-
-def browser_run(url, steps, keep_open=False, background=True, timeout_ms=90000):
-    """Runs steps (a @puppeteer/replay UserFlow's Step[] JSON, plus our
-    read/readAll/loop/etc. customStep extensions) against url via the mywant
-    browser extension — the CDP-free replacement for
-    playwright.chromium.connect_over_cdp. See engine/server/handlers_web_wants.go's
-    browserRun and mcp/playwright-app/webext-src/browser-run-interpreter.ts.
-    background=True (default) opens the tab without stealing focus."""
-    payload = json.dumps({
-        "url": url, "steps": steps, "keep_open": keep_open,
-        "background": background, "timeout_ms": timeout_ms,
-    }).encode()
-    req = urllib.request.Request(
-        f"{MYWANT_API}/api/v1/web-wants/browser-run",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=(timeout_ms / 1000) + 10) as r:
-        data = json.loads(r.read())
-    if data.get("error"):
-        raise RuntimeError(data["error"])
-    return data.get("result", {})
 
 
 def report_progress(percentage, message=""):
