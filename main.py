@@ -16,8 +16,8 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.expanduser("~/.mywant/custom-types/shared"))
-from mywant_browser_run import browser_run  # noqa: E402
+sys.path.insert(0, os.path.expanduser("~/work/machine-readable-skills-browser"))
+from mrs_browser import browser_run  # noqa: E402
 
 CACHE_FILE = "/tmp/gmail_unread_list.json"
 GMAIL_IMPORTANT_URL = "https://mail.google.com/mail/u/0/#imp"
