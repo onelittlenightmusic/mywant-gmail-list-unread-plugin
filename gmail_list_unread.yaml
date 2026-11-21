@@ -21,6 +21,17 @@ wantType:
 
   finalResultField: mrs_raw_output.emails
 
+  # When it tells of its answer, besides every new one (the standard timing
+  # "answer"). new_mail: an unread important mail on top that was not there
+  # before (the newest one's subject moved), while there are any.
+  timings:
+    - name: new_mail
+      description: 新しい重要メールが来たとき
+      if: count
+      onChange: first_subject
+      murmur: true
+      notify: true
+
   state:
     - name: skill_timeout_seconds
       description: Max seconds to wait for the skill script to complete (default 120)
