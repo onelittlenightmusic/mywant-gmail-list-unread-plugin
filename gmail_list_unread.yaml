@@ -27,6 +27,7 @@ wantType:
   timings:
     - name: new_mail
       description: 新しい重要メールが来たとき
+      icon: mail
       if: count
       onChange: first_subject
       murmur: true
