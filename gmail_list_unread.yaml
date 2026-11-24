@@ -12,6 +12,9 @@ wantType:
     category: gmail
     pattern: independent
     labels:
+      # What the robot reads a request against, when it asks Laya which want
+      # it is: the type in a few words of its own (laya-option).
+      laya-option: "Gmailの未読メールを見る"
       aliases: "gmail,mail,未読メール"
       category-icon: Mail
       category-bg-light: "linear-gradient(160deg, #fecaca 0%, #fff1f2 100%)"
@@ -134,3 +137,12 @@ wantType:
         metadata:
           name: check_gmail
           type: gmail_list_unread
+
+  # How a want of this type is asked for, in words, and what it is made with
+  # (want-spec asks): what reads requests (the robot, Laya) learns from these
+  # and is tested on them. A parameter left out is one the request does not say.
+  asks:
+    - say: "未読メール"
+      variants: ["未読のメールを見せて", "まだ読んでないメール", "新着メール"]
+    - say: "Gmailの未読を見せて"
+      variants: ["Gmailの未読メール", "Gmailで読んでないメール", "Gmailの新着"]
